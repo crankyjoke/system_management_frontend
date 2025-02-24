@@ -12,14 +12,36 @@ import {message} from "antd";
 //     ...(options || {}),
 //   });
 // }
+
+
+// export async function currentUser(options?: { [key: string]: any }) {
+//   return request<API.CurrentUser>('http://localhost:8080/api/currentUser', {
+//     method: 'GET',
+//     withCredentials: true, // ✅ Ensures session-based authentication
+//     ...(options || {}),
+//   }).catch(error => {
+//     console.error("❌ Failed to fetch user:", error);
+//   });
+// }
 export async function currentUser(options?: { [key: string]: any }) {
-  return request<API.CurrentUser>('http://localhost:8080/api/currentUser', {
-    method: 'GET',
-    withCredentials: true, // ✅ Ensures session-based authentication
-    ...(options || {}),
-  }).catch(error => {
+  try {
+    const response = await request<API.CurrentUser>('http://localhost:8080/api/currentUser', {
+      method: 'GET',
+      withCredentials: true, // ✅ Ensures session-based authentication
+      ...(options || {}),
+    });
+    // const authority = response.roles[0].authority;
+    // console.log(authority); // Output: "ROLE_ADMIN"
+    //
+    //
+    // console.log("📡 API Response:", response.roles);
+    // console.log("🔑 User Permission:", response?.authority);
+
+    return response;
+  } catch (error) {
     console.error("❌ Failed to fetch user:", error);
-  });
+    return undefined;
+  }
 }
 
 /** 退出登录接口 POST /api/login/outLogin */
@@ -30,60 +52,63 @@ export async function outLogin(options?: { [key: string]: any }) {
   });
 }
 
-/** 登录接口 POST /api/login/account */
-// export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-//   return request<API.LoginResult>('/api/login/account', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     data: body,
-//     ...(options || {}),
-//   });
-// }
-// export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-//   console.log("Sending login request:", body);
-//
-//   return request<API.LoginResult>('http://localhost:8080/login', {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/x-www-form-urlencoded',
-//     },
-//     data: `username=${encodeURIComponent(body.username ?? '')}&password=${encodeURIComponent(body.password ?? '')}`,
-//     withCredentials: true, // ✅ Ensures session is saved
-//     ...(options || {}),
-//   }).catch(error => {
-//     console.error("Login failed:", error);
-//   });
-// }
-export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-  console.log("🔍 Sending login request:", body);
 
+/** 登录接口 POST /api/login/account */
+
+// export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
+//   console.log("🔍 Sending login request:", body);
+//
+//   try {
+//     const response = await request<API.LoginResult>('http://localhost:8080/login', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/x-www-form-urlencoded',
+//       },
+//       data: `username=${encodeURIComponent(body.username ?? '')}&password=${encodeURIComponent(body.password ?? '')}`,
+//       withCredentials: true, // ✅ Ensures session is saved
+//       ...(options || {}),
+//     });
+//
+//     if (response && response.status === 'ok') {
+//       message.success("🎉 Login successful!");
+//       history.push('/welcome); // ✅ Redirect to dashboard
+//     } else {
+//       message.error(`❌ Login failed: ${response.message}`);
+//     }
+//
+//     return response;
+//   } catch (error) {
+//     console.error("❌ Login request failed:", error);
+//     message.error("❌ An error occurred while logging in.");
+//     throw error;
+//   }
+// }
+export async function login(body: API.LoginParams) {
   try {
+    console.log("🔍 Sending login request:", body);
+
     const response = await request<API.LoginResult>('http://localhost:8080/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      data: `username=${encodeURIComponent(body.username ?? '')}&password=${encodeURIComponent(body.password ?? '')}`,
-      withCredentials: true, // ✅ Ensures session is saved
-      ...(options || {}),
+      data: new URLSearchParams({
+        username: body.username ?? '',
+        password: body.password ?? '',
+        permission: body.permission ?? '',
+      }).toString(),
+      withCredentials: true, // ✅ Ensures session authentication
     });
 
-    if (response && response.status === 'ok') {
-      message.success("🎉 Login successful!");
-      history.push('/dashboard'); // ✅ Redirect to dashboard
-    } else {
-      message.error(`❌ Login failed: ${response.message}`);
-    }
+    console.log("✅ Login successful:", response);
 
     return response;
   } catch (error) {
     console.error("❌ Login request failed:", error);
-    message.error("❌ An error occurred while logging in.");
     throw error;
   }
 }
+
 
 /** 此处后端没有提供注释 GET /api/notices */
 export async function getNotices(options?: { [key: string]: any }) {

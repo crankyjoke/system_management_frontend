@@ -3,6 +3,8 @@
 
 declare namespace API {
   type CurrentUser = {
+    username(arg0: string, username: any): unknown;
+    authority?:string;
     name?: string;
     avatar?: string;
     userid?: string;
@@ -14,7 +16,7 @@ declare namespace API {
     notifyCount?: number;
     unreadCount?: number;
     country?: string;
-    access?: string;
+    roles?: string;
     geographic?: {
       province?: { label?: string; key?: string };
       city?: { label?: string; key?: string };
@@ -63,6 +65,7 @@ declare namespace API {
   };
 
   type LoginParams = {
+    permission: string;
     username?: string;
     password?: string;
     autoLogin?: boolean;

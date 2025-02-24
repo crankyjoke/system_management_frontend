@@ -15,26 +15,65 @@ const loginPath = '/user/login';
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
+// export async function getInitialState(): Promise<{
+//   settings?: Partial<LayoutSettings>;
+//   currentUser?: API.CurrentUser;
+//   loading?: boolean;
+//   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
+// }> {
+//   const fetchUserInfo = async () => {
+//     try {
+//       const msg = await queryCurrentUser({
+//         skipErrorHandler: true,
+//       });
+//       return msg.data;
+//     } catch (error) {
+//       history.push(loginPath);
+//     }
+//     return undefined;
+//   };
+//   // 如果不是登录页面，执行
+//   const { location } = history;
+//   if (location.pathname !== loginPath) {
+//     const currentUser = await fetchUserInfo();
+//     return {
+//       fetchUserInfo,
+//       currentUser,
+//       settings: defaultSettings as Partial<LayoutSettings>,
+//     };
+//   }
+//   return {
+//     fetchUserInfo,
+//     settings: defaultSettings as Partial<LayoutSettings>,
+//   };
+// }
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
   loading?: boolean;
   fetchUserInfo?: () => Promise<API.CurrentUser | undefined>;
 }> {
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = async (): Promise<API.CurrentUser | undefined> => {
+
     try {
-      const msg = await queryCurrentUser({
-        skipErrorHandler: true,
-      });
-      return msg.data;
+      const msg = await queryCurrentUser({ skipErrorHandler: true });
+      if (msg && msg.username) {
+        console.log(msg.roles[0].authority);
+        console.log("✅ User authenticated:", msg.username);
+        return msg;
+      }
     } catch (error) {
+      console.error("❌ Failed to fetch user:", error);
       history.push(loginPath);
     }
+    // If we get here, user is not logged in or error
+    console.log("no users")
     return undefined;
   };
-  // 如果不是登录页面，执行
+
   const { location } = history;
   if (location.pathname !== loginPath) {
+    // This returns a `CurrentUser | undefined`
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
@@ -42,6 +81,7 @@ export async function getInitialState(): Promise<{
       settings: defaultSettings as Partial<LayoutSettings>,
     };
   }
+
   return {
     fetchUserInfo,
     settings: defaultSettings as Partial<LayoutSettings>,

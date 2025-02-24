@@ -27,6 +27,7 @@ export default [
     name: 'welcome',
     icon: 'smile',
     component: './Welcome',
+    access: 'canUser',
   },
   {
     path: '/admin',
@@ -61,6 +62,7 @@ export default [
     icon: 'table',
     path: '/list',
     component: './TableList',
+    access: 'canUser',
   },
   {
     path: '/',
