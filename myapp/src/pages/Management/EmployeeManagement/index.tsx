@@ -3,28 +3,26 @@ import {
   FooterToolbar,
   ModalForm,
   PageContainer,
-  ProDescriptions,
   ProFormText,
   ProFormSelect,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Drawer, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Button, message } from 'antd';
+import React, { useRef, useState, useEffect } from 'react';
 import { fetchUsers, addUser, updateUser, deleteUser } from './ManagementService';
 
 interface User {
   id: number;
-  name: string;
-  email: string;
-  roles: string[];
-  allowedTabs: string[];
+  username: string;
+  email: string | null;
+  accesspage: number | null;
 }
 
 const availableTabs = [
-  { label: 'Dashboard', value: 'dashboard' },
-  { label: 'Settings', value: 'settings' },
-  { label: 'Users', value: 'users' },
-  { label: 'Reports', value: 'reports' },
+  { label: 'Dashboard', value: 1 },
+  { label: 'Settings', value: 2 },
+  { label: 'Users', value: 3 },
+  { label: 'Reports', value: 4 },
 ];
 
 const UserManagement: React.FC = () => {
@@ -34,25 +32,30 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const actionRef = useRef<any>();
 
-  React.useEffect(() => {
-    fetchUsers().then(setUsers);
+  useEffect(() => {
+    fetchUsers().then((data) => {
+      console.log('📡 API Response:', data);
+      setUsers(data);
+    });
   }, []);
 
   const columns = [
-    { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-      render: (role: string) => <strong>{role}</strong>,
+      title: 'id',dataIndex: 'id',key:'id'
     },
+    { title: 'Username', dataIndex: 'username', key: 'username' },
+    { title: 'Email', dataIndex: 'email', key: 'email', render: (email: string | null) => email || 'N/A' },
     {
       title: 'Allowed Tabs',
-      dataIndex: 'allowedTabs',
-      key: 'allowedTabs',
-      render: (tabs: string[]) => tabs.join(', '),
+      dataIndex: 'accesspage',
+      key: 'accesspage',
+      render: (accesspage: number | null) => {
+        if (!accesspage) return 'No Access';
+        const tab = availableTabs.find((tab) => tab.value === accesspage);
+        return tab ? tab.label : 'Unknown';
+      },
     },
+
     {
       title: 'Actions',
       key: 'actions',
@@ -62,10 +65,17 @@ const UserManagement: React.FC = () => {
           <a
             style={{ color: 'red', marginLeft: 10 }}
             onClick={async () => {
-              await deleteUser(record.id);
-              setUsers(users.filter((u) => u.id !== record.id));
+              const success = await deleteUser(record.id);
+              if (success) {
+                message.success('✅ User deleted successfully');
+                setUsers((prevUsers) => prevUsers.filter((u) => u.id !== record.id));
+              } else {
+                message.error('❌ Failed to delete user');
+              }
             }}
-          >Delete</a>
+          >
+            Delete
+          </a>
         </>
       ),
     },
@@ -92,25 +102,28 @@ const UserManagement: React.FC = () => {
         open={modalOpen}
         onOpenChange={setModalOpen}
         onFinish={async (values) => {
-          const success = await addUser({ id: users.length + 1, ...values });
-          if (success) {
-            setUsers([...users, success]);
-            setModalOpen(false);
+          try {
+            const newUser = await addUser(values); // ✅ Backend generates ID
+
+            if (newUser) {
+              message.success("✅ User added successfully!");
+              setUsers([...users, newUser]); // ✅ Correctly update state
+              setModalOpen(false);
+            } else {
+              message.error("❌ Failed to add user");
+            }
+          } catch (error) {
+            console.error("❌ Error adding user:", error);
+            message.error("❌ An error occurred while adding the user");
           }
         }}
       >
-        <ProFormText name="name" label="Name" rules={[{ required: true }]} />
+        <ProFormText name="username" label="Username" rules={[{ required: true }]} />
         <ProFormText name="email" label="Email" rules={[{ required: true, type: 'email' }]} />
+        <ProFormText.Password name="password" label="Password" rules={[{ required: true }]} />
         <ProFormSelect
-          name="role"
-          label="Role"
-          options={[{ label: 'Admin', value: 'Admin' }, { label: 'User', value: 'User' }]}
-          rules={[{ required: true }]}
-        />
-        <ProFormSelect
-          name="allowedTabs"
+          name="accesspage"
           label="Allowed Tabs"
-          mode="multiple"
           options={availableTabs}
           rules={[{ required: true }]}
         />
@@ -131,18 +144,11 @@ const UserManagement: React.FC = () => {
             }
           }}
         >
-          <ProFormText name="name" label="Name" rules={[{ required: true }]} />
+          <ProFormText name="username" label="Username" rules={[{ required: true }]} />
           <ProFormText name="email" label="Email" rules={[{ required: true, type: 'email' }]} />
           <ProFormSelect
-            name="role"
-            label="Role"
-            options={[{ label: 'Admin', value: 'Admin' }, { label: 'User', value: 'User' }]}
-            rules={[{ required: true }]}
-          />
-          <ProFormSelect
-            name="allowedTabs"
+            name="accesspage"
             label="Allowed Tabs"
-            mode="multiple"
             options={availableTabs}
             rules={[{ required: true }]}
           />

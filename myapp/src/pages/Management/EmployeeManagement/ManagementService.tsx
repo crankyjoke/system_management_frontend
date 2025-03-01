@@ -1,53 +1,79 @@
 import axios from 'axios';
 
-const API_URL = 'https://your-api.com/users';
+const BASE_URL = 'http://localhost:8080/api';
+
+const USERNAME = 'admin1';
+const PASSWORD = 'admin123';
 
 export const fetchUsers = async () => {
   try {
-    const response = await axios.get(API_URL);
-    return response.data;
+    const response = await axios.get(`${BASE_URL}/getall`, {
+      headers: {
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+      }
+    });
+
+    console.log('📡 API Response:', response.data); // ✅ Log API response
+    return Array.isArray(response.data) ? response.data : []; // ✅ Ensure it returns an array
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('❌ Error fetching users:', error);
     return [];
   }
 };
 
+
+// ✅ Add a new user
 export const addUser = async (user) => {
   try {
-    const response = await axios.post(API_URL, user);
+    const response = await axios.post(`${BASE_URL}/createUser`, user, {
+      headers: {
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+      }
+    });
     return response.data;
   } catch (error) {
-    console.error('Error adding user:', error);
+    console.error('❌ Error adding user:', error);
     return null;
   }
 };
 
+// ✅ Update a user's details
 export const updateUser = async (id, user) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, user);
+    const response = await axios.put(`${BASE_URL}/users/${id}`, user);
     return response.data;
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error('❌ Error updating user:', error);
     return null;
   }
 };
 
-export const deleteUser = async (id) => {
+// ✅ Delete a user
+export const deleteUser = async (id: number) => {
   try {
-    await axios.delete(`${API_URL}/${id}`);
+    const response = await axios.delete(`${BASE_URL}/delete/${id}`, {
+      headers: {
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+      }
+    });
+    console.log(response);
+    if(response.data === false){
+      return false;
+    }
     return true;
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error('❌ Error deleting user:', error);
     return false;
   }
 };
 
+// ✅ Update a user's permissions
 export const updateUserPermissions = async (id, permissions) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}/permissions`, { permissions });
+    const response = await axios.put(`${BASE_URL}/users/${id}/permissions`, { permissions });
     return response.data;
   } catch (error) {
-    console.error('Error updating user permissions:', error);
+    console.error('❌ Error updating user permissions:', error);
     return null;
   }
 };

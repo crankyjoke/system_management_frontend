@@ -65,6 +65,12 @@ export default [
     access: 'canUser',
   },
   {
+    name:'api-rules',
+    path: 'umi/plugin/openapi',
+    access: 'canAdmin'
+
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },

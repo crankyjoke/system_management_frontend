@@ -8,7 +8,7 @@ import { history, Link } from '@umijs/max';
 import React from 'react';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
-
+import { LogoutOutlined } from '@ant-design/icons';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -47,6 +47,9 @@ const loginPath = '/user/login';
 //     settings: defaultSettings as Partial<LayoutSettings>,
 //   };
 // }
+
+
+
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;
@@ -58,6 +61,7 @@ export async function getInitialState(): Promise<{
     try {
       const msg = await queryCurrentUser({ skipErrorHandler: true });
       if (msg && msg.username) {
+        // @ts-ignore
         console.log(msg.roles[0].authority);
         console.log("✅ User authenticated:", msg.username);
         return msg;
@@ -88,6 +92,9 @@ export async function getInitialState(): Promise<{
   };
 }
 
+
+
+
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
@@ -95,8 +102,8 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
-      render: (_, avatarChildren) => {
-        return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
+      render: () => {
+        return initialState?.currentUser?.username || 'Guest';
       },
     },
     waterMarkProps: {

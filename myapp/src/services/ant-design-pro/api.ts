@@ -4,25 +4,7 @@ import { request } from '@umijs/max';
 import { history } from '@umijs/max';
 import {message} from "antd";
 /** 获取当前的用户 GET /api/currentUser */
-// export async function currentUser(options?: { [key: string]: any }) {
-//   return request<{
-//     data: API.CurrentUser;
-//   }>('/api/currentUser', {
-//     method: 'GET',
-//     ...(options || {}),
-//   });
-// }
 
-
-// export async function currentUser(options?: { [key: string]: any }) {
-//   return request<API.CurrentUser>('http://localhost:8080/api/currentUser', {
-//     method: 'GET',
-//     withCredentials: true, // ✅ Ensures session-based authentication
-//     ...(options || {}),
-//   }).catch(error => {
-//     console.error("❌ Failed to fetch user:", error);
-//   });
-// }
 export async function currentUser(options?: { [key: string]: any }) {
   try {
     const response = await request<API.CurrentUser>('http://localhost:8080/api/currentUser', {

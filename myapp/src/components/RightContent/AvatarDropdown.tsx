@@ -8,6 +8,7 @@ import { stringify } from 'querystring';
 import React from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
+import {getInitialState} from "@/app";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -86,15 +87,16 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     </span>
   );
 
-  if (!initialState) {
-    return loading;
-  }
 
-  const { currentUser } = initialState;
-
-  if (!currentUser || !currentUser.name) {
-    return loading;
-  }
+  // if (!initialState) {
+  //   return loading;
+  // }
+  //
+  // const { currentUser } = initialState;
+  //
+  // if (!currentUser || !currentUser.name) {
+  //   return loading;
+  // }
 
   const menuItems = [
     ...(menu
@@ -122,6 +124,7 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
   ];
 
   return (
+    <main>
     <HeaderDropdown
       menu={{
         selectedKeys: [],
@@ -131,5 +134,6 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     >
       {children}
     </HeaderDropdown>
+    </main>
   );
 };
