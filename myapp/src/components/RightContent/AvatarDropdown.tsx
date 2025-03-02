@@ -59,6 +59,17 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
       });
     }
   };
+  function handleLogout() {
+    // Example: remove token or do any cleanup
+    localStorage.removeItem('token');
+
+    // Clear the user in global state
+    setInitialState((s) => ({ ...s, currentUser: undefined }));
+
+    // Redirect to login
+    history.push('/user/login');
+
+  }
   const { styles } = useStyles();
 
   const { initialState, setInitialState } = useModel('@@initialState');

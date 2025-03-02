@@ -3,6 +3,7 @@
 import { request } from '@umijs/max';
 import { history } from '@umijs/max';
 import {message} from "antd";
+import {response} from "express";
 /** 获取当前的用户 GET /api/currentUser */
 
 export async function currentUser(options?: { [key: string]: any }) {
@@ -27,12 +28,54 @@ export async function currentUser(options?: { [key: string]: any }) {
 }
 
 /** 退出登录接口 POST /api/login/outLogin */
+// export async function outLogin(options?: { [key: string]: any }) {
+//   console.log("Logging out...");
+//
+//   // ✅ Fix: Use removeItem instead of delete
+//   localStorage.removeItem('token');
+//
+//   return request<Record<string, any>>('http://localhost:8080/api/logout', {
+//     method: 'POST',
+//     ...(options || {}),
+//   });
+// }
 export async function outLogin(options?: { [key: string]: any }) {
-  return request<Record<string, any>>('/api/login/outLogin', {
-    method: 'POST',
-    ...(options || {}),
-  });
+  console.log("🚀 Logging out...");
+
+  try {
+    // **1. Make API call to backend logout endpoint**
+    await request<Record<string, any>>('http://localhost:8080/api/logout', {
+      method: 'POST',
+      ...(options || {}),
+    });
+
+    // **2. Remove authentication tokens**
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+    localStorage.clear();
+
+    // **3. Clear permissions (if using roles/permissions)**
+    if (navigator.credentials && navigator.credentials.preventSilentAccess) {
+      navigator.credentials.preventSilentAccess();
+    }
+
+    // **4. Invalidate session cookies**
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+
+    // **5. Redirect to login page**
+    history.push('/user/login');
+
+    console.log("✅ User logged out successfully");
+  } catch (error) {
+    console.error("❌ Logout failed:", error);
+  }
 }
+
+
 
 
 /** 登录接口 POST /api/login/account */
@@ -152,3 +195,5 @@ export async function removeRule(options?: { [key: string]: any }) {
     },
   });
 }
+
+
