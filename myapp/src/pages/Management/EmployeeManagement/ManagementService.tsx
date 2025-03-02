@@ -40,7 +40,11 @@ export const addUser = async (user) => {
 // ✅ Update a user's details
 export const updateUser = async (id, user) => {
   try {
-    const response = await axios.put(`${BASE_URL}/users/${id}`, user);
+    const response = await axios.put(`${BASE_URL}/update/${id}`, user, {
+      headers: {
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('❌ Error updating user:', error);

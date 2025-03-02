@@ -1,5 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   FooterToolbar,
   ModalForm,
   PageContainer,
@@ -16,6 +17,8 @@ interface User {
   username: string;
   email: string | null;
   accesspage: number | null;
+  password: string | null;
+  permission: string | null;
 }
 
 const availableTabs = [
@@ -44,7 +47,9 @@ const UserManagement: React.FC = () => {
       title: 'id',dataIndex: 'id',key:'id'
     },
     { title: 'Username', dataIndex: 'username', key: 'username' },
+    {title: 'Password', dataIndex: 'password', key: 'password' },
     { title: 'Email', dataIndex: 'email', key: 'email', render: (email: string | null) => email || 'N/A' },
+    {title:'Permission', dataIndex: 'permission', key: 'permission'},
     {
       title: 'Allowed Tabs',
       dataIndex: 'accesspage',
@@ -103,11 +108,11 @@ const UserManagement: React.FC = () => {
         onOpenChange={setModalOpen}
         onFinish={async (values) => {
           try {
-            const newUser = await addUser(values); // ✅ Backend generates ID
+            const newUser = await addUser(values);
 
             if (newUser) {
               message.success("✅ User added successfully!");
-              setUsers([...users, newUser]); // ✅ Correctly update state
+              setUsers([...users, newUser]);
               setModalOpen(false);
             } else {
               message.error("❌ Failed to add user");
@@ -118,9 +123,10 @@ const UserManagement: React.FC = () => {
           }
         }}
       >
-        <ProFormText name="username" label="Username" rules={[{ required: true }]} />
-        <ProFormText name="email" label="Email" rules={[{ required: true, type: 'email' }]} />
-        <ProFormText.Password name="password" label="Password" rules={[{ required: true }]} />
+        <ProFormText name="username" label="Username" rules={[{ required: false }]} />
+        <ProFormText name="email" label="Email" rules={[{ required: false, type: 'email' }]} />
+        <ProFormText.Password name="password" label="Password" rules={[{ required: false }]} />
+        <ProFormText.Password name="Permission" label="Permission" rules={[{ required: false}]} />
         <ProFormSelect
           name="accesspage"
           label="Allowed Tabs"
@@ -137,15 +143,18 @@ const UserManagement: React.FC = () => {
           onOpenChange={setEditModalOpen}
           initialValues={selectedUser}
           onFinish={async (values) => {
+            console.log(values);
             const success = await updateUser(selectedUser.id, values);
             if (success) {
-              setUsers(users.map((u) => (u.id === selectedUser.id ? { ...u, ...values } : u)));
+              // setUsers(users.map((u) => (u.id === selectedUser.id ? { ...u, ...values } : u)));
               setEditModalOpen(false);
             }
           }}
         >
           <ProFormText name="username" label="Username" rules={[{ required: true }]} />
           <ProFormText name="email" label="Email" rules={[{ required: true, type: 'email' }]} />
+          <ProFormText.Password name="password" label="Password" rules={[{ required: false }]} />
+          <ProFormText.Password name="Permission" label="Permission" rules={[{ required: false}]} />
           <ProFormSelect
             name="accesspage"
             label="Allowed Tabs"

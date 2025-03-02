@@ -8,7 +8,7 @@ export default function access(initialState: { currentUser?: API.CurrentUser } |
     // @ts-ignore
     canAdmin: currentUser && currentUser.roles[0].authority === 'ROLE_ADMIN',
     // @ts-ignore
-    canUser: currentUser && (currentUser.roles[0].authority === 'ROLE_ADMIN'|| currentUser.roles[0].authority === 'ROLE_USER'),
+    canUser: currentUser && (currentUser.roles[0].authority === 'ROLE_ADMIN'|| currentUser.roles[0].authority === 'ROLE_USER' || currentUser.roles[0].authority === 'ROLE_USER_TYPE1'),
   };
 }
 

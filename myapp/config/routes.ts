@@ -72,7 +72,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/user/login',
   },
   {
     path: '*',
