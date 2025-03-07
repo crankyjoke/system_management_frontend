@@ -205,12 +205,10 @@ const Login: React.FC = () => {
             autoLogin: true,
           }}
           actions={[
-            <FormattedMessage
-              key="loginWith"
-              id="pages.login.loginWith"
-              defaultMessage="其他登录方式"
-            />,
-            <ActionIcons key="icons" />,
+            <FormattedMessage key="register-text" id="pages.login.registerAccount" defaultMessage="Register" />,
+            <a key="register-button" onClick={() => history.push('/user/register')} style={{ fontWeight: 'bold' }}>
+              🚀 Sign Up
+            </a>,
           ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);

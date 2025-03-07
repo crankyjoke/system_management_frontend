@@ -24,7 +24,10 @@ declare namespace API {
     address?: string;
     phone?: string;
   };
+  type RegisterResult = {
 
+  };
+  type
   type LoginResult = {
     message: any;
     status?: string;

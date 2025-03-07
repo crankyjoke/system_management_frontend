@@ -19,6 +19,13 @@ export default [
         name: 'login',
         path: '/user/login',
         component: './User/Login',
+
+      },
+      {
+        name: 'register',
+        icon: '',
+        path:'/user/register',
+        component: './Register',
       },
     ],
   },
@@ -65,6 +72,36 @@ export default [
     access: 'canUser',
   },
   {
+    name: 'p1',
+    icon: 'table',
+    path:'/p1',
+    component: './Page1',
+    access:'canPage1',
+  },
+  {
+    name: 'p2',
+    icon: 'table',
+    path:'/p2',
+    component: './Page2',
+    access:'canPage2',
+  },
+  {
+    name: 'p3',
+    icon: 'table',
+    path:'/p3',
+    component: './Page3',
+    access:'canPage3',
+  },
+  {
+    name: 'p4',
+    icon: 'table',
+    path:'/p4',
+    component: './Page4',
+    access:'canPage4',
+  },
+
+
+  {
     name:'api-rules',
     path: 'umi/plugin/openapi',
     access: 'canAdmin'
@@ -74,6 +111,7 @@ export default [
     path: '/',
     redirect: '/user/login',
   },
+
   {
     path: '*',
     layout: false,

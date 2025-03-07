@@ -86,28 +86,6 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     history.push(`/account/${key}`);
   };
 
-  const loading = (
-    <span className={styles.action}>
-      <Spin
-        size="small"
-        style={{
-          marginLeft: 8,
-          marginRight: 8,
-        }}
-      />
-    </span>
-  );
-
-
-  // if (!initialState) {
-  //   return loading;
-  // }
-  //
-  // const { currentUser } = initialState;
-  //
-  // if (!currentUser || !currentUser.name) {
-  //   return loading;
-  // }
 
   const menuItems = [
     ...(menu

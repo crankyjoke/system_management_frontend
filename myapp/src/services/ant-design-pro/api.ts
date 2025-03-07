@@ -4,6 +4,7 @@ import { request } from '@umijs/max';
 import { history } from '@umijs/max';
 import {message} from "antd";
 import {response} from "express";
+import {UmiHistory} from "@@/core/historyIntelli";
 /** 获取当前的用户 GET /api/currentUser */
 
 export async function currentUser(options?: { [key: string]: any }) {
@@ -39,6 +40,10 @@ export async function currentUser(options?: { [key: string]: any }) {
 //     ...(options || {}),
 //   });
 // }
+export async function registerUser(h: UmiHistory) {
+
+}
+
 export async function outLogin(options?: { [key: string]: any }) {
   console.log("🚀 Logging out...");
 
@@ -74,6 +79,7 @@ export async function outLogin(options?: { [key: string]: any }) {
     console.error("❌ Logout failed:", error);
   }
 }
+
 
 
 

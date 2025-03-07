@@ -9,12 +9,12 @@ export const fetchUsers = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/getall`, {
       headers: {
-        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` 
       }
     });
 
-    console.log('📡 API Response:', response.data); // ✅ Log API response
-    return Array.isArray(response.data) ? response.data : []; // ✅ Ensure it returns an array
+    console.log('📡 API Response:', response.data);
+    return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
     console.error('❌ Error fetching users:', error);
     return [];
@@ -22,12 +22,12 @@ export const fetchUsers = async () => {
 };
 
 
-// ✅ Add a new user
+
 export const addUser = async (user) => {
   try {
     const response = await axios.post(`${BASE_URL}/createUser`, user, {
       headers: {
-        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}`
       }
     });
     return response.data;
@@ -37,12 +37,12 @@ export const addUser = async (user) => {
   }
 };
 
-// ✅ Update a user's details
+
 export const updateUser = async (id, user) => {
   try {
     const response = await axios.put(`${BASE_URL}/update/${id}`, user, {
       headers: {
-        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}`
       }
     });
     return response.data;
@@ -52,12 +52,12 @@ export const updateUser = async (id, user) => {
   }
 };
 
-// ✅ Delete a user
+
 export const deleteUser = async (id: number) => {
   try {
     const response = await axios.delete(`${BASE_URL}/delete/${id}`, {
       headers: {
-        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}` // ✅ Encode credentials in Base64
+        Authorization: `Basic ${btoa(`${USERNAME}:${PASSWORD}`)}`
       }
     });
     console.log(response);
@@ -71,7 +71,7 @@ export const deleteUser = async (id: number) => {
   }
 };
 
-// ✅ Update a user's permissions
+
 export const updateUserPermissions = async (id, permissions) => {
   try {
     const response = await axios.put(`${BASE_URL}/users/${id}/permissions`, { permissions });
