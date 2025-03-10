@@ -69,6 +69,12 @@ export default [
         component: './Management/EmployeePositionManagement',
         access:'canAdmin',
       },
+      {
+        name: 'Organization',
+        icon: 'table',
+        path: '/admin/OrganizationManagement',
+        component: './Management/OrganizationManagement',
+      }
     ],
   },
   {
