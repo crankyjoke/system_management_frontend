@@ -62,6 +62,13 @@ export default [
         name: 'authorization',
         component: './Admin',
       },
+      {
+        name: 'UserPosition',
+        icon: 'table',
+        path: '/admin/EmployeePositionManagement',
+        component: './Management/EmployeePositionManagement',
+        access:'canAdmin',
+      },
     ],
   },
   {
@@ -99,6 +106,7 @@ export default [
     component: './Page4',
     access:'canPage4',
   },
+
 
 
   {

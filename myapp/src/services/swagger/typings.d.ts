@@ -109,4 +109,11 @@ declare namespace API {
     /** User Status */
     userStatus?: number;
   };
+  type Position = {
+    id?: number;
+    username?: string;
+    position?: any;
+    organization?: string;
+    balance?: number;
+  }
 }
