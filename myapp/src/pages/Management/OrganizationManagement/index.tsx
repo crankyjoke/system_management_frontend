@@ -67,7 +67,7 @@ const OrganizationManagement: React.FC = () => {
   // 🔹 Table Columns
   const userColumns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Name', dataIndex: 'name', key: 'name' },
+    // { title: 'Name', dataIndex: 'name', key: 'name' },
   ];
 
   // 🔹 Loading Spinner
