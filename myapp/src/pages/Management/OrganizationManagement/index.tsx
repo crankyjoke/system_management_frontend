@@ -5,81 +5,79 @@ import {
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { Button, Tabs, message } from 'antd';
+import { Button, Tabs, message, Spin } from 'antd';
 import React, { useState, useEffect } from 'react';
 
-interface Organization {
-  id: number;
-  name: string;
-  description: string;
-}
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
-const fetchOrganizations = async (): Promise<Organization[]> => {
-  return [
-    { id: 1, name: 'Org A', description: 'Description A' },
-    { id: 2, name: 'Org B', description: 'Description B' },
-  ];
-};
-
-const fetchUsersByOrganization = async (orgId: number): Promise<User[]> => {
-  const users: Record<number, User[]> = {
-    1: [
-      { id: 101, name: 'Alice Johnson', email: 'alice@example.com' },
-      { id: 102, name: 'Bob Smith', email: 'bob@example.com' },
-    ],
-    2: [
-      { id: 201, name: 'Charlie Brown', email: 'charlie@example.com' },
-      { id: 202, name: 'David Lee', email: 'david@example.com' },
-    ],
-  };
-  return users[orgId] || [];
-};
-
-const addOrganization = async (organization: Organization): Promise<Organization> => {
-  return { ...organization, id: Math.floor(Math.random() * 1000) };
-};
-
-const addUserToOrganization = async (user: User, orgId: number): Promise<User> => {
-  return { ...user, id: Math.floor(Math.random() * 1000) };
-};
+import {
+  fetchOrganizationTables,
+  fetchUsersByOrganization,
+  createOrganizationTable,
+  insertUserIntoOrganization,
+  Organization,
+  User,
+} from "@/pages/Management/OrganizationManagement/organizationService";
 
 const OrganizationManagement: React.FC = () => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
+  const [selectedOrganization, setSelectedOrganization] = useState<string | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [addUserModalOpen, setAddUserModalOpen] = useState<boolean>(false);
+  const [addOrgModalOpen, setAddOrgModalOpen] = useState<boolean>(false);
 
-  // Fetch organizations on mount
-  useEffect(() => {
-    fetchOrganizations().then((orgs) => setOrganizations(orgs));
-  }, []);
-
-  // Handle organization tab change
-  const handleTabChange = async (activeKey: string) => {
-    const orgId = parseInt(activeKey);
-    const selectedOrg = organizations.find((org) => org.id === orgId) || null;
-    setSelectedOrganization(selectedOrg);
-    if (selectedOrg) {
-      const usersData = await fetchUsersByOrganization(orgId);
-      setUsers(usersData);
-    }
+  // 🔹 Load users from "org_" + baseName
+  const loadUsers = async (orgTable: string) => {
+    if (!orgTable) return;
+    const usersData = await fetchUsersByOrganization(orgTable);
+    console.log("🟢 Final Users in loadUsers:", usersData);
+    setUsers(usersData);
   };
 
+  // 🔹 Fetch & load organization tables on mount
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      // e.g. ["org_sales", "org_marketing"]
+      const orgTables = await fetchOrganizationTables();
+
+      // convert to base names: ["sales", "marketing"]
+      const cleanedOrgTables = orgTables.map((name) => ({
+        name: name.replace(/^org_/, ""),
+      }));
+
+      setOrganizations(cleanedOrgTables);
+      setLoading(false);
+
+      // select first org if any
+      if (cleanedOrgTables.length > 0) {
+        const firstOrg = cleanedOrgTables[0].name; // e.g. "sales"
+        setSelectedOrganization(firstOrg);         // store "sales"
+        loadUsers(`org_${firstOrg}`);             // fetch "org_sales"
+      }
+    };
+    loadData();
+  }, []);
+
+  // 🔹 Handle Organization Tab Change
+  const handleTabChange = (activeKey: string) => {
+    setSelectedOrganization(activeKey);         // store "sales" or "marketing"
+    loadUsers(`org_${activeKey}`);             // e.g. "org_marketing"
+  };
+
+  // 🔹 Table Columns
   const userColumns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
     { title: 'Name', dataIndex: 'name', key: 'name' },
-    { title: 'Email', dataIndex: 'email', key: 'email' },
   ];
+
+  // 🔹 Loading Spinner
+  if (loading) {
+    return <Spin size="large" style={{ display: 'block', margin: 'auto', marginTop: 50 }} />;
+  }
 
   return (
     <PageContainer>
-      {/* 🔹 Add Organization Button */}
+      {/* 🔹 Action Buttons */}
       <Button
         type="primary"
         onClick={() => setAddUserModalOpen(true)}
@@ -90,16 +88,20 @@ const OrganizationManagement: React.FC = () => {
       </Button>
       <Button
         type="primary"
-        onClick={() => setAddUserModalOpen(true)}
+        onClick={() => setAddOrgModalOpen(true)}
         style={{ marginBottom: 20 }}
       >
         <PlusOutlined /> Add Organization
       </Button>
 
-      {/* 🔹 Tabs to switch between organizations */}
-      <Tabs defaultActiveKey="all" type="card" onChange={handleTabChange}>
+      {/* 🔹 Tabs for Organizations */}
+      <Tabs
+        activeKey={selectedOrganization || ""}
+        type="card"
+        onChange={handleTabChange}
+      >
         {organizations.map((org) => (
-          <Tabs.TabPane tab={org.name} key={org.id.toString()}>
+          <Tabs.TabPane tab={org.name} key={org.name}>
             <ProTable<User>
               headerTitle={`Users in ${org.name}`}
               rowKey="id"
@@ -112,30 +114,55 @@ const OrganizationManagement: React.FC = () => {
         ))}
       </Tabs>
 
-      {/* 🔹 Add User Modal */}
+      {/* 🔹 Modal: Add User */}
       <ModalForm<User>
         title="Add User to Organization"
         open={addUserModalOpen}
         onOpenChange={setAddUserModalOpen}
         onFinish={async (values) => {
-          if (!selectedOrganization) return;
-          try {
-            const newUser = await addUserToOrganization(values, selectedOrganization.id);
-            if (newUser) {
-              message.success(`User "${newUser.name}" added to ${selectedOrganization.name}`);
-              setUsers((prev) => [...prev, newUser]);
-              setAddUserModalOpen(false);
-            } else {
-              message.error("Failed to add user");
-            }
-          } catch (error) {
-            console.error("Error adding user:", error);
-            message.error("An error occurred while adding the user");
+          if (!selectedOrganization) {
+            message.error("No organization selected.");
+            return;
+          }
+          // => "org_sales" or "org_marketing"
+          const orgTableName = `org_${selectedOrganization}`;
+          const newUser = await insertUserIntoOrganization(values, orgTableName);
+
+          if (newUser) {
+            message.success(`User "${newUser.name}" added successfully.`);
+            setUsers((prev) => [...prev, newUser]);
+            setAddUserModalOpen(false);
+          } else {
+            message.error("Failed to add user.");
           }
         }}
       >
+        <ProFormText name="id" label="User ID" rules={[{ required: true }]} />
         <ProFormText name="name" label="User Name" rules={[{ required: true }]} />
-        <ProFormText name="email" label="Email" rules={[{ required: true, type: 'email' }]} />
+      </ModalForm>
+
+      {/* 🔹 Modal: Add Organization */}
+      <ModalForm<Organization>
+        title="Add Organization"
+        open={addOrgModalOpen}
+        onOpenChange={setAddOrgModalOpen}
+        onFinish={async (values) => {
+          const sanitized = values.name.replace(/^org_/, "").trim();
+          const success = await createOrganizationTable(sanitized);
+          if (success) {
+            message.success(`Organization "${sanitized}" added successfully.`);
+            setOrganizations((prev) => [...prev, { name: sanitized }]);
+            setAddOrgModalOpen(false);
+          } else {
+            message.error("Failed to add organization.");
+          }
+        }}
+      >
+        <ProFormText
+          name="name"
+          label="Organization Name"
+          rules={[{ required: true }]}
+        />
       </ModalForm>
     </PageContainer>
   );
