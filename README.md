@@ -19,7 +19,7 @@ This is the **React-based frontend** for the [System Management Portal](https://
 ## 🔥 Features
 
 - ✨ Clean login and authentication UI
-- 🔐 Role-based dynamic routing (`admin`, `user`, `manager`)
+- 🔐 Role-based dynamic routing (`admin`, `user`, `manager`) supports customizable access control
 - 🌐 Integrated with Spring Boot backend
 - 🧩 Modular page and layout components
 - 🎯 Internationalization (i18n) support ready
