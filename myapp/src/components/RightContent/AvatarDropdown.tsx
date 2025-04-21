@@ -9,7 +9,7 @@ import React from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
 import {getInitialState} from "@/app";
-
+import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 export type GlobalHeaderRightProps = {
   menu?: boolean;
   children?: React.ReactNode;
@@ -74,13 +74,17 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
 
   const { initialState, setInitialState } = useModel('@@initialState');
 
-  const onMenuClick: MenuProps['onClick'] = (event) => {
-    const { key } = event;
+  const onMenuClick: MenuProps['onClick'] = async (event) => {
+    const {key} = event;
     if (key === 'logout') {
       flushSync(() => {
-        setInitialState((s) => ({ ...s, currentUser: undefined }));
+        setInitialState((s) => ({...s, currentUser: undefined}));
       });
       loginOut();
+      handleLogout();
+      console.log("logout");
+      const msg = await queryCurrentUser({skipErrorHandler: true});
+      console.log(msg);
       return;
     }
     history.push(`/account/${key}`);

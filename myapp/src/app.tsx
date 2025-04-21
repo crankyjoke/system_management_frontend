@@ -49,7 +49,6 @@ const loginPath = '/user/login';
 // }
 
 
-
 export async function getInitialState(): Promise<{
   settings?: Partial<LayoutSettings>;
   currentUser?: API.CurrentUser;

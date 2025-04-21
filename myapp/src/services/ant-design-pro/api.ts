@@ -44,39 +44,71 @@ export async function registerUser(h: UmiHistory) {
 
 }
 
-export async function outLogin(options?: { [key: string]: any }) {
-  console.log("🚀 Logging out...");
+// export async function outLogin(options?: { [key: string]: any }) {
+//   console.log("🚀 Logging out...");
+//
+//   try {
+//     // **1. Make API call to backend logout endpoint**
+//     await request<Record<string, any>>('http://localhost:8080/api/logout', {
+//       method: 'POST',
+//       ...(options || {}),
+//     });
+//
+//     // **2. Remove authentication tokens**
+//     localStorage.removeItem('token');
+//     sessionStorage.clear();
+//     localStorage.clear();
+//
+//     // **3. Clear permissions (if using roles/permissions)**
+//     if (navigator.credentials && navigator.credentials.preventSilentAccess) {
+//       navigator.credentials.preventSilentAccess();
+//     }
+//
+//     // **4. Invalidate session cookies**
+//     document.cookie.split(";").forEach((c) => {
+//       document.cookie = c
+//         .replace(/^ +/, "")
+//         .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+//     });
+//
+//     // **5. Redirect to login page**
+//     history.push('/user/login');
+//
+//     console.log("✅ User logged out successfully");
+//   } catch (error) {
+//     console.error("❌ Logout failed:", error);
+//   }
+// }
+export async function outLogin(options?: Record<string, any>) {
+  console.log('🚀 Logging out…');
 
   try {
-    // **1. Make API call to backend logout endpoint**
-    await request<Record<string, any>>('http://localhost:8080/api/logout', {
+    /* 1️⃣  Tell the server – include the JSESSIONID cookie  */
+    await request('http://localhost:8080/api/logout', {
       method: 'POST',
+      withCredentials: true,     //  <‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑
       ...(options || {}),
     });
 
-    // **2. Remove authentication tokens**
-    localStorage.removeItem('token');
-    sessionStorage.clear();
+    /* 2️⃣  Purge every client‑side credential  */
     localStorage.clear();
-
-    // **3. Clear permissions (if using roles/permissions)**
-    if (navigator.credentials && navigator.credentials.preventSilentAccess) {
-      navigator.credentials.preventSilentAccess();
-    }
-
-    // **4. Invalidate session cookies**
-    document.cookie.split(";").forEach((c) => {
+    sessionStorage.clear();
+    document.cookie.split(';').forEach((c) => {
       document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        .replace(/^ +/, '')
+        .replace(/=.*/, '=;expires=' + new Date(0).toUTCString() + ';path=/');
     });
 
-    // **5. Redirect to login page**
-    history.push('/user/login');
+    /* 3️⃣  Clear Ant‑Design‑Pro initialState & redirect  */
+    //  Use history.push('/user/login') *after*
+    //  you overwrite initialState.currentUser
+    const { setInitialState } = await import('@umijs/max');
+    await setInitialState(() => ({ currentUser: undefined }));
 
-    console.log("✅ User logged out successfully");
-  } catch (error) {
-    console.error("❌ Logout failed:", error);
+    history.push('/user/login');
+    console.log('✅ Logged out.');
+  } catch (err) {
+    console.error('❌ Logout failed:', err);
   }
 }
 

@@ -85,7 +85,7 @@ export default [
     access: 'canUser',
   },
   {
-    name: 'p1',
+    name: 'Add time table',
     icon: 'table',
     path:'/p1',
     component: './Page1',
